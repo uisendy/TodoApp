@@ -1,0 +1,42 @@
+# Ignore Visual Studio settings
+.vs/
+**/.vs/
+
+# Ignore build outputs (applies to all projects)
+**/bin/
+**/obj/
+out/
+
+# Ignore user-specific and IDE files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vscode/
+.idea/
+
+# Ignore local config/secrets
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/secrets.json
+# Logs and debug symbols
+*.log
+logs/
+*.pdb
+
+# Ignore EF Core migrations (optional — remove if you want to keep them)
+**/Migrations/
+
+# Ignore NuGet packages and cache
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# Databases
+*.db
+*.sqlite
+
+# OS-specific
+.DS_Store
+Thumbs.db
