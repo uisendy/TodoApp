@@ -1,12 +1,11 @@
 import { Modal } from '../ui/modal/index';
 import { Formik, Form, Field } from 'formik';
-import { useDispatch } from 'react-redux';
 import { updateTodo, archiveTodo } from '../../features/todo/todoSlice';
 import MultiSelect from '../form/MultiSelect';
 import { FieldWrapper } from '../form/FieldWrapper';
 import Label from '../form/Label';
 import Button from '../ui/button/Button';
-import { Todo, TodoRequest, TodoTag } from '../../types';
+import { Todo } from '../../types';
 import { useAppDispatch } from '../../hooks/useAppDispatch';
 import { useAppSelector } from '../../hooks/useAppSelector';
 
@@ -14,15 +13,13 @@ export default function EditTodoModal({
   isOpen,
   onClose,
   todo,
-  todoTags,
 }: {
   isOpen: boolean;
   onClose: () => void;
   todo: Todo;
-  todoTags: string[];
 }) {
   const dispatch = useAppDispatch();
-  const { status, tags, priorities } = useAppSelector(state => state.todos);
+  const { tags, priorities } = useAppSelector(state => state.todos);
 
   const initialValues = {
     name: todo.name,
@@ -62,7 +59,7 @@ export default function EditTodoModal({
         </div>
 
         <Formik initialValues={initialValues} onSubmit={handleUpdate}>
-          {({ isSubmitting, setFieldValue, values }) => (
+          {({ isSubmitting, setFieldValue }) => (
             <Form className="flex flex-col">
               <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
                 <div className="mt-7">

@@ -1,5 +1,3 @@
-import { boolean } from 'yup';
-
 export interface User {
   id: string;
   firstName: string;

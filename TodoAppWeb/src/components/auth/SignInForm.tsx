@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { AppDispatch, RootState } from '../../app/store';
-import { signin, signup } from '../../features/auth/authSlice';
+import { signin } from '../../features/auth/authSlice';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { DropdownItem } from '../ui/dropdown/DropdownItem';
 import { Dropdown } from '../ui/dropdown/Dropdown';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store';
 import { useAppDispatch } from '../../hooks/useAppDispatch';

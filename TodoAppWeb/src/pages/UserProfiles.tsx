@@ -8,6 +8,8 @@ import PageMeta from '../components/common/PageMeta';
 export default function UserProfiles() {
   const user = useSelector((state: RootState) => state.auth.user);
 
+  console.log('user data', user);
+
   return (
     <>
       <PageMeta

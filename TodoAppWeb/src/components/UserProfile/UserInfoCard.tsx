@@ -6,7 +6,7 @@ import Label from '../form/Label';
 import { Formik, Form, Field } from 'formik';
 import { useState } from 'react';
 import { useAppDispatch } from '../../hooks/useAppDispatch';
-import { updateUser } from '../../features/auth/authSlice';
+import { loadUser, updateUser } from '../../features/auth/authSlice';
 
 interface UserInfoCardProps {
   firstName: string;
@@ -98,7 +98,11 @@ export default function UserInfoCard({
             </p>
           </div>
 
-          <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+          <Formik
+            initialValues={initialValues}
+            onSubmit={handleSubmit}
+            enableReinitialize={true}
+          >
             <Form className="flex flex-col">
               <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
                 <div className="mt-7">

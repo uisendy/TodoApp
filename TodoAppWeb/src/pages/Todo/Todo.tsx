@@ -7,7 +7,6 @@ import Button from '../../components/ui/button/Button';
 import { useAppDispatch } from '../../hooks/useAppDispatch';
 import { useAppSelector } from '../../hooks/useAppSelector';
 import {
-  archiveTodo,
   createTodo,
   fetchPriorities,
   fetchTags,
@@ -211,7 +210,6 @@ export default function Todo() {
           isOpen={!!editTodo}
           onClose={() => setEditTodo(null)}
           todo={editTodo}
-          todoTags={editTodo.tags.map(t => t.name)}
         />
       )}
     </>

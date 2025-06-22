@@ -3,7 +3,7 @@ import Badge from '../ui/badge/Badge';
 import { MoreDotIcon } from '../../icons';
 import { Dropdown } from '../ui/dropdown/Dropdown';
 import { DropdownItem } from '../ui/dropdown/DropdownItem';
-import { Todo, TodoItemProps } from '../../types';
+import { TodoItemProps } from '../../types';
 import { priorityMap } from '../../utils/priorityMapper';
 import { smartDateTime } from '../../utils/smartDateTime';
 import { archiveTodo } from '../../features/todo/todoSlice';

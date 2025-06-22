@@ -1,5 +1,4 @@
 import TodoListChartTab from '../common/TodoListChartTab';
-import TodoItem from './TodoItem';
 
 export default function TodoListChart() {
   return (

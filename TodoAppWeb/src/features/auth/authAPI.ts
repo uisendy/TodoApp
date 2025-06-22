@@ -94,7 +94,8 @@ export async function updateUserProfile(
     }
   );
 
-  return response.data;
+  console.log('response from api', response.data.data);
+  return response.data.data;
 }
 
 export const refreshAccessToken = async (refreshToken: string) => {
