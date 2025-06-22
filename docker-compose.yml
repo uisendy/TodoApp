@@ -34,6 +34,17 @@ services:
       - todoapp_network
 
 
+  todoapp_ui:
+    build:
+      context: ./todoAppWeb
+      dockerfile: Dockerfile
+    container_name: todoapp_ui
+    ports:
+      - "5000:80"
+    depends_on:
+      - todoapp_api
+
+
 volumes:
   postgres_data:
 
