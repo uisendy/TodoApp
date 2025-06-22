@@ -4,7 +4,7 @@ namespace TodoAppApi.Interfaces
 {
     public interface ITokenService
     {
-        string GenerateToken(User user);
+        (string AccessToken, string Jti) GenerateAccessToken(User user);
         string GenerateRefreshToken();
 
     }

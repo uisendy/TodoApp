@@ -17,14 +17,16 @@ namespace TodoAppApi.Infrastructure.Security
             _config = config;
         }
 
-        public string GenerateToken(User user)
+        public (string AccessToken, string Jti) GenerateAccessToken(User user)
         {
+            var jti = Guid.NewGuid().ToString();
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
-        };
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, jti),
+                new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"] ?? throw new InvalidOperationException("Jwt:Secret is missing")));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -37,7 +39,7 @@ namespace TodoAppApi.Infrastructure.Security
                 signingCredentials: creds
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return (new JwtSecurityTokenHandler().WriteToken(token), jti);
         }
 
         public string GenerateRefreshToken()

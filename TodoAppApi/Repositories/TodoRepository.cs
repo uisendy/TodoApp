@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TodoAppApi.Data;
+using TodoAppApi.DTOs.Todos;
 using TodoAppApi.Entities;
 using TodoAppApi.Interfaces;
 
@@ -21,18 +22,21 @@ namespace TodoAppApi.Repositories
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public async Task<IEnumerable<Todo>> GetByUserIdAsync(Guid userId)
+        public async Task<List<Todo>> GetByUserIdAsync(Guid userId)
         {
             return await _context.Todos
-                .Where(t => t.UserId == userId && !t.IsArchived)
                 .Include(t => t.TodoTags)
+                    .ThenInclude(tt => tt.Tag)
+                .Where(t => t.UserId == userId)
+                .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Todo>> GetAllAsync()
+        public async Task<List<Todo>> GetAllAsync()
         {
             return await _context.Todos
                 .Include(t => t.TodoTags)
+                    .ThenInclude(tt => tt.Tag)
                 .ToListAsync();
         }
 
@@ -44,6 +48,32 @@ namespace TodoAppApi.Repositories
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Tag>> GetTagsByIdsAsync(List<Guid> ids)
+        {
+            return await _context.Tags
+                .Where(t => ids.Contains(t.Id))
+                .ToListAsync();
+        }
+
+        public async Task<Todo> GetByIdWithTagsAsync(Guid id)
+        {
+            var todo=  await _context.Todos
+                .Include(t => t.TodoTags)
+                    .ThenInclude(tt => tt.Tag)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            return todo ?? throw new Exception("Todo not found");
+        }
+
+
+        public async Task<IEnumerable<Tag>> GetAllTagsAsync()
+        {
+            return await _context.Tags
+                .AsNoTracking()
+                .OrderBy(t => t.Name)
+                .ToListAsync();
         }
 
         public async Task<bool> ArchiveAsync(Guid userId, Guid todoId)
@@ -65,6 +95,24 @@ namespace TodoAppApi.Repositories
             todo.Description = update.Description;
             todo.Priority = update.Priority;
             todo.UpdatedAt = DateTime.UtcNow;
+
+
+
+
+            todo.TodoTags.Clear(); 
+
+            
+            if (update.TodoTags != null && update.TodoTags.Count > 0)
+            {
+                foreach (var tag in update.TodoTags)
+                {
+                    todo.TodoTags.Add(new TodoTag
+                    {
+                        TodoId = todo.Id,
+                        TagId = tag.TagId
+                    });
+                }
+            }
 
             return todo;
         }

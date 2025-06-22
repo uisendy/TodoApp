@@ -29,6 +29,20 @@ namespace TodoAppApi.Controllers.v1
             return Ok(ApiResponseDto<IEnumerable<TodoResponseDto>>.Success(todos));
         }
 
+        [HttpGet("priorities")]
+        public IActionResult GetPriorities()
+        {
+            var priorities = _todoService.GetTodoPriorities();
+            return Ok(ApiResponseDto<IEnumerable<PriorityDto>>.Success(priorities));
+        }
+
+        [HttpGet("tags")]
+        public async Task<IActionResult> GetTodoTags()
+        {
+            var tags = await _todoService.GetTodoTagsAsync();
+            return Ok(ApiResponseDto<IEnumerable<TodoTagDto>>.Success(tags));
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -51,6 +65,15 @@ namespace TodoAppApi.Controllers.v1
             var updated = await _todoService.UpdateTodoAsync(userId, id, request);
             return Ok(ApiResponseDto<TodoResponseDto>.Success(updated));
         }
+
+        [HttpPatch("{id}/toggle-completion")]
+        public async Task<IActionResult> ToggleCompletion(Guid id)
+        {
+            var userId = User.GetUserId();
+            var updatedTodo = await _todoService.ToggleCompletionAsync(userId, id);
+            return Ok(ApiResponseDto<TodoResponseDto>.Success(updatedTodo));
+        }
+
 
         [HttpPut("{id}/archive")]
         public async Task<IActionResult> Archive(Guid id)

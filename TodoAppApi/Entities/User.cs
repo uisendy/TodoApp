@@ -6,11 +6,14 @@
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
         public required string Email { get; set; }
+        public string? Phone { get; set; }
+        public string? Bio { get; set; }
         public required string PasswordHash { get; set; }
         public string? Otp { get; set; }
         public DateTime? OtpExpiry { get; set; }
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiry { get; set; }
+        public string? CurrentJti { get; set; }
         public bool IsVerified { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

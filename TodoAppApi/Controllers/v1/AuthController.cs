@@ -55,12 +55,38 @@ namespace TodoAppApi.Controllers.v1
         {
             try
             {
-                var user = await _authService.LoginAsync(request);
+                var (success, message, user) = await _authService.LoginAsync(request);
 
-                var tokens = _tokenManager.GenerateAndHashTokens(user);
+                if (!success)
+                {
+                    if (user != null && !user.IsVerified)
+                    {
+                        var unverifiedResponse = new AuthResponseDto
+                        {
+                            Id = user.Id,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName,
+                            Email = user.Email,
+                            Phone = user.Phone,
+                            Bio = user.Bio
+                        };
+
+                        return Accepted(ApiResponseDto<object>.Success(unverifiedResponse,
+                            "OTP sent to email address for Verification"
+                        ));
+                    }
+
+                    return BadRequest(ApiResponseDto<string>.Error(message ?? "Login failed"));
+                }
+
+                if (user == null )
+                    return BadRequest(ApiResponseDto<string>.Error("User Not Found"));
+
+                var tokens = _tokenManager.GenerateTokens(user!);
 
                 user.RefreshToken = TokenHashHelper.HashToken(tokens.RefreshToken);
                 user.RefreshTokenExpiry = tokens.RefreshTokenExpiry;
+                user.CurrentJti = tokens.CurrentJti;
                 await _repo.SaveChangesAsync();
 
                 HttpContext.Items["TokenContext"] = new TokenContext
@@ -68,7 +94,6 @@ namespace TodoAppApi.Controllers.v1
                     AccessToken = tokens.AccessToken,
                     RefreshToken = tokens.RefreshToken
                 };
-
 
                 var response = new AuthResponseDto
                 {
@@ -85,6 +110,7 @@ namespace TodoAppApi.Controllers.v1
                 return BadRequest(ApiResponseDto<string>.Error(ex.Message));
             }
         }
+
 
         [HttpPost("send-otp")]
         public async Task<IActionResult> SendOtp([FromBody] string email)

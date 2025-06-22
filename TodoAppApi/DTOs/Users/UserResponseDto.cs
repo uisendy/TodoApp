@@ -8,6 +8,8 @@ namespace TodoAppApi.DTOs.Users
         public string FirstName { get; set; } = default!;
         public string LastName { get; set; } = default!;
         public string Email { get; set; } = default!;
-        public List<TodoItemDto> Todos { get; set; } = new();
+        public string Phone { get; set; } = default!;
+        public string Bio { get; set; } = default!;
+       
     }
 }

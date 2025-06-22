@@ -5,6 +5,6 @@ namespace TodoAppApi.Interfaces
 {
     public interface ITokenManager
     {
-        TokenResultDto GenerateAndHashTokens(User user);
+        TokenResultDto GenerateTokens(User user);
     }
 }

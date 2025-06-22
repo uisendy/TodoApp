@@ -9,9 +9,10 @@ namespace TodoAppApi.DTOs.Todos
         public string? Description { get; set; }
         public bool IsCompleted { get; set; }
         public bool IsArchived { get; set; }
+        public DateTime ArchivedAt { get; set; }
         public PriorityLevel Priority { get; set; }
         public DateTime CreatedAt { get; set; }
-        public List<string> Tags { get; set; } = new();
+        public List<TodoTagDto> Tags { get; set; } = new();
     }
 
 }

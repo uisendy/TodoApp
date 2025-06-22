@@ -11,12 +11,14 @@ namespace TodoAppApi.Services
         private readonly IAuthRepository _repo;
         private readonly ITokenManager _tokenManager;
         private readonly IEmailService _emailService;
+        private readonly ILogger<AuthService> _logger;
 
-        public AuthService(IAuthRepository repo, ITokenManager tokenManager, IEmailService emailService)
+        public AuthService(IAuthRepository repo, ITokenManager tokenManager, IEmailService emailService, ILogger<AuthService> logger)
         {
             _repo = repo;
             _tokenManager = tokenManager;
             _emailService = emailService;
+            _logger = logger;
         }
 
         public async Task<User> RegisterAsync(RegisterRequestDto request)
@@ -45,16 +47,24 @@ namespace TodoAppApi.Services
             return user;
         }
 
-        public async Task<User> LoginAsync(LoginRequestDto request)
+        public async Task<(bool Success, string? Message, User? User)> LoginAsync(LoginRequestDto request)
         {
             var user = await _repo.GetUserByEmailAsync(request.Email);
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-                throw new Exception("Invalid email or password");
+                return (false, "Invalid email or password", null);
 
             if (!user.IsVerified)
-                throw new Exception("Email not verified");
+            {
+                var otp = OTPHelper.GenerateOtp();
+                user.Otp = otp;
+                user.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
+                await _repo.SaveChangesAsync();
+                await _emailService.SendEmailOtpAsync(user.Email, otp);
 
-            return user;
+                return (false, "User not verified. OTP sent to email address.", user);
+            }
+
+            return (true, null, user);
         }
 
         public async Task SendOtpAsync(string email)
@@ -89,14 +99,17 @@ namespace TodoAppApi.Services
 
         public async Task<(string AccessToken, string RefreshToken)> RefreshTokenAsync(string refreshToken)
         {
-            var user = await _repo.GetUserByRefreshTokenAsync(refreshToken);
+            var user = await _repo.GetUserByRefreshTokenAsync(TokenHashHelper.HashToken(refreshToken));
+            _logger.LogInformation("this is the user profile {@user}", user);
+
             if (user == null || user.RefreshTokenExpiry < DateTime.UtcNow)
                 throw new UnauthorizedAccessException("Invalid or expired refresh token");
 
-            var tokens = _tokenManager.GenerateAndHashTokens(user);
+            var tokens = _tokenManager.GenerateTokens(user);
 
             user.RefreshToken = TokenHashHelper.HashToken(tokens.RefreshToken);
             user.RefreshTokenExpiry = tokens.RefreshTokenExpiry;
+            user.CurrentJti = tokens.CurrentJti;
             await _repo.SaveChangesAsync();
 
             return (tokens.AccessToken, tokens.RefreshToken);

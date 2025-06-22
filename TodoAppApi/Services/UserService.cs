@@ -1,52 +1,50 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TodoAppApi.Data;
-using TodoAppApi.DTOs.Todos;
-using TodoAppApi.DTOs.Users;
-using TodoAppApi.Entities;
+﻿using TodoAppApi.DTOs.Users;
 using TodoAppApi.Interfaces;
 
 namespace TodoAppApi.Services
 {
     public class UserService : IUserService
     {
-        private readonly AppDbContext _context;
+        private readonly IUserRepository _userRepository;
 
-        public UserService(AppDbContext context)
+        public UserService(IUserRepository userRepository)
         {
-            _context = context;
+            _userRepository = userRepository;
         }
 
         public async Task<UserResponseDto> GetUserProfileAsync(Guid userId)
         {
-            var user = await _context.Users
-                .Include(u => u.Todos)
-                    .ThenInclude(t => t.TodoTags)
-                        .ThenInclude(tt => tt.Tag)
-                .FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _userRepository.GetByIdAsync(userId);
+            return user == null
+                ? throw new Exception("User not found")
+                : new UserResponseDto
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        Phone = user.Phone ?? "" ,
+                        Bio = user.Bio ?? ""
+                    };
+        }
 
-            if (user == null)
-                throw new Exception("User not found");
+        public async Task UpdateUserProfileAsync(Guid userId, UpdateUserRequestDto dto)
+        {
+            var user = await _userRepository.GetByIdAsync(userId) ?? throw new Exception("User not found");
+            if (!string.IsNullOrWhiteSpace(dto.FirstName))
+                user.FirstName = dto.FirstName;
 
-            return new UserResponseDto
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                Todos = user.Todos.Select(t => new TodoItemDto
-                {
-                    Id = t.Id,
-                    Name = t.Name,
-                    Description = t.Description,
-                    IsCompleted = t.IsCompleted,
-                    IsArchived = t.IsArchived,
-                    Priority = t.Priority,
-                    CreatedAt = t.CreatedAt,
-                    UpdatedAt = t.UpdatedAt,
-                    ArchivedAt = t.ArchivedAt,
-                    Tags = t.TodoTags.Select(tt => tt.Tag.Name).ToList()
-                }).ToList()
-            };
+            if (!string.IsNullOrWhiteSpace(dto.LastName))
+                user.LastName = dto.LastName;
+
+            if (!string.IsNullOrWhiteSpace(dto.Phone))
+                user.Phone = dto.Phone;
+
+            if (!string.IsNullOrWhiteSpace(dto.Bio))
+                user.Bio = dto.Bio;
+
+            await _userRepository.UpdateAsync(user);
+            await _userRepository.SaveChangesAsync();
         }
 
     }

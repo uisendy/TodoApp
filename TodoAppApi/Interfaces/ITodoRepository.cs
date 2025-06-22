@@ -5,8 +5,11 @@ namespace TodoAppApi.Interfaces
     public interface ITodoRepository
     {
         Task<Todo?> GetByIdAsync(Guid id);
-        Task<IEnumerable<Todo>> GetByUserIdAsync(Guid userId);
-        Task<IEnumerable<Todo>> GetAllAsync();
+        Task<List<Todo>> GetByUserIdAsync(Guid userId);
+        Task<List<Todo>> GetAllAsync();
+        Task<List<Tag>> GetTagsByIdsAsync(List<Guid> ids);
+        Task<Todo> GetByIdWithTagsAsync(Guid id);
+        Task<IEnumerable<Tag>> GetAllTagsAsync();
         Task AddAsync(Todo todo);
         Task SaveChangesAsync();
         Task<bool> ArchiveAsync(Guid userId, Guid todoId);

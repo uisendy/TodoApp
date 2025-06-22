@@ -3,7 +3,6 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TodoAppApi.DTOs.Common;
-using TodoAppApi.DTOs.Todos;
 using TodoAppApi.DTOs.Users;
 using TodoAppApi.Infrastructure.Extensions;
 using TodoAppApi.Interfaces;
@@ -16,20 +15,22 @@ namespace TodoAppApi.Controllers.v1
     [Authorize]
     public class UserController : ControllerBase
     {
+        private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, ILogger<UserController> logger)
         {
             _userService = userService;
+            _logger = logger;
         }
 
         [HttpGet("current-user")]
-        [Authorize]
         public async Task<IActionResult> GetCurrentUser()
         {
+            
             try
             {
-                var userId = User.GetUserId();
+                var userId = HttpContext.User.GetUserId();
                 var userProfile = await _userService.GetUserProfileAsync(userId);
                 return Ok(ApiResponseDto<UserResponseDto>.Success(userProfile));
             }
@@ -39,7 +40,24 @@ namespace TodoAppApi.Controllers.v1
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, message: ex.Message);
                 return StatusCode(500, ApiResponseDto<string>.Error("An unexpected error occurred."));
+            }
+        }
+
+        [HttpPut("update-profile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserRequestDto dto)
+        {
+            try
+            {
+                var userId = HttpContext.User.GetUserId();
+                await _userService.UpdateUserProfileAsync(userId, dto);
+                return Ok(ApiResponseDto<string>.Success("Profile updated successfully"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, message: ex.Message);
+                return StatusCode(500, ApiResponseDto<string>.Error("Failed to update profile"));
             }
         }
 

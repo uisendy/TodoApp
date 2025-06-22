@@ -9,16 +9,16 @@ namespace TodoAppApi.Services.Security
     {
         private readonly ITokenService _tokenService = tokenService;
 
-        public TokenResultDto GenerateAndHashTokens(User user)
+        public TokenResultDto GenerateTokens(User user)
         {
-            var accessToken = _tokenService.GenerateToken(user);
+            var (accessToken, jti) = _tokenService.GenerateAccessToken(user);
             var refreshToken = _tokenService.GenerateRefreshToken();
-            var hashedRefreshToken = TokenHashHelper.HashToken(refreshToken);
 
             return new TokenResultDto
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
+                CurrentJti = jti,
                 RefreshTokenExpiry = DateTime.UtcNow.AddDays(7),
             };
         }

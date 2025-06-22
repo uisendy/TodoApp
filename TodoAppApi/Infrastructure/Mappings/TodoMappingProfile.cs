@@ -8,11 +8,19 @@ namespace TodoAppApi.Infrastructure.Mappings
     {
         public TodoMappingProfile()
         {
-            CreateMap<Todo, TodoResponseDto>()
-                .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.TodoTags.Select(tt => tt.Tag.Name)))
-                .ReverseMap();
+            CreateMap<TodoRequestDto, Todo>()
+            .ForMember(dest => dest.TodoTags, opt => opt.Ignore());
 
-            CreateMap<TodoRequestDto, Todo>();
+            CreateMap<Todo, TodoResponseDto>()
+                .ForMember(dest => dest.Tags, opt => opt.MapFrom(src =>
+                    src.TodoTags
+                    .Where(tt => tt.Tag != null)
+                    .Select(tt => new TodoTagDto
+                    {
+                        Id = tt.Tag.Id,
+                        Name = tt.Tag.Name
+                    }).ToList()
+                ));
         }
     }
 }
