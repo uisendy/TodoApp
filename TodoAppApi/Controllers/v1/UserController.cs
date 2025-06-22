@@ -51,8 +51,8 @@ namespace TodoAppApi.Controllers.v1
             try
             {
                 var userId = HttpContext.User.GetUserId();
-                await _userService.UpdateUserProfileAsync(userId, dto);
-                return Ok(ApiResponseDto<string>.Success("Profile updated successfully"));
+                var updatedUser = await _userService.UpdateUserProfileAsync(userId, dto);
+                return Ok(ApiResponseDto<UserResponseDto>.Success(updatedUser, "User Profile Updated Successfully"));
             }
             catch (Exception ex)
             {

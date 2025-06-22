@@ -6,6 +6,6 @@ namespace TodoAppApi.Interfaces
     public interface IUserService
     {
         Task<UserResponseDto> GetUserProfileAsync(Guid userId);
-        Task UpdateUserProfileAsync(Guid userId, UpdateUserRequestDto dto);
+        Task<UserResponseDto> UpdateUserProfileAsync(Guid userId, UpdateUserRequestDto dto);
     }
 }

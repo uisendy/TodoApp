@@ -28,24 +28,35 @@ namespace TodoAppApi.Services
                     };
         }
 
-        public async Task UpdateUserProfileAsync(Guid userId, UpdateUserRequestDto dto)
+        public async Task<UserResponseDto> UpdateUserProfileAsync(Guid userId, UpdateUserRequestDto dto)
         {
             var user = await _userRepository.GetByIdAsync(userId) ?? throw new Exception("User not found");
-            if (!string.IsNullOrWhiteSpace(dto.FirstName))
-                user.FirstName = dto.FirstName;
 
-            if (!string.IsNullOrWhiteSpace(dto.LastName))
-                user.LastName = dto.LastName;
+            if (string.IsNullOrWhiteSpace(dto.FirstName))
+                throw new ArgumentException("First name is required");
+            user.FirstName = dto.FirstName ?? user.FirstName;
 
-            if (!string.IsNullOrWhiteSpace(dto.Phone))
-                user.Phone = dto.Phone;
+            if (string.IsNullOrWhiteSpace(dto.LastName))
+                throw new ArgumentException("Last name is required");
+            user.LastName = dto.LastName ?? user.LastName;
 
-            if (!string.IsNullOrWhiteSpace(dto.Bio))
-                user.Bio = dto.Bio;
+            user.Phone = dto.Phone ?? user.Phone;
+            user.Bio = dto.Bio ?? user.Bio;
 
             await _userRepository.UpdateAsync(user);
             await _userRepository.SaveChangesAsync();
+
+            return new UserResponseDto
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Phone = user.Phone ?? "",
+                Bio = user.Bio ?? ""
+            };
         }
+
 
     }
 }
