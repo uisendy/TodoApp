@@ -1,4 +1,5 @@
 services:
+    
   postgres:
     image: postgres:15
     container_name: todoapp_postgres
@@ -15,16 +16,23 @@ services:
     networks:
       - todoapp_network
 
-  adminer:
-    image: adminer
-    container_name: todoapp_adminer
-    restart: always
+
+  todoapp_api:
+    build:
+      context: .
+      dockerfile: TodoAppApi/Dockerfile
+    container_name: todoapp_api
     ports:
-      - "8080:8080"
+      - "5500:8080"   
     depends_on:
       - postgres
+    command: ["/wait-for-it.sh", "postgres:5432", "--", "dotnet", "TodoAppApi.dll"]
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:8080
     networks:
       - todoapp_network
+
 
 volumes:
   postgres_data:
