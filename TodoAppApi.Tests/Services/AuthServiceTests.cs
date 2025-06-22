@@ -195,7 +195,7 @@ namespace TodoAppApi.Tests.Services
             _repoMock.Setup(r => r.GetUserByRefreshTokenAsync(refreshToken))
                      .ReturnsAsync(user);
 
-            _tokenManagerMock.Setup(tm => tm.GenerateAndHashTokens(user))
+            _tokenManagerMock.Setup(tm => tm.GenerateTokens(user))
                              .Returns(new TokenResultDto
                              {
                                  AccessToken = "new-access-token",

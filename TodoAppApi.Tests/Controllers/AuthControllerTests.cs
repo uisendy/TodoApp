@@ -98,7 +98,7 @@ namespace TodoAppApi.Tests.Controllers
             _authServiceMock.Setup(s => s.LoginAsync(It.IsAny<LoginRequestDto>()))
                             .ReturnsAsync(user);
 
-            _tokenManagerMock.Setup(t => t.GenerateAndHashTokens(user))
+            _tokenManagerMock.Setup(t => t.GenerateTokens(user))
                              .Returns(tokenResult);
 
             _repoMock.Setup(r => r.SaveChangesAsync())

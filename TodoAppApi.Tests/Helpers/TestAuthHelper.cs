@@ -28,8 +28,7 @@ public static class TestAuthHelper
             PasswordHash="hasPassword"
             
         };
-
-        var token = tokenService.GenerateToken(user);
+        var (token, _) = tokenService.GenerateAccessToken(user);
         return (userId, token, user);
     }
 
